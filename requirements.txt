@@ -1,10 +1,7 @@
-streamlit==1.32.2 
+streamlit==1.32.2
 langchain==0.1.14
-langchain-community==0.0.40
-langchain-core==0.1.53
-pypdf==3.17.4
-sentence-transformers==2.2.2
-transformers==4.40.0
-tqdm==4.66.2
-watchdog==4.0.0
 chromadb==0.4.24
+unstructured
+pdfplumber
+sentence-transformers
+tiktoken
