@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
 from langchain_community.chat_models import ChatOpenAI
@@ -30,8 +30,8 @@ def reload_all_data():
             splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
             texts = splitter.split_text(raw_text)
 
-            db = FAISS.from_texts(texts, embeddings)
-            db.save_local(vector_path)
+            db = Chroma.from_texts(texts, embedding=embeddings, persist_directory=vector_path)
+            db.persist()
 
 # === Giao diện Streamlit ===
 st.set_page_config(page_title="Trợ Lý AI - ANCB", layout="wide")
@@ -55,9 +55,9 @@ else:
         index_name = selected_file.replace(".pdf", "")
         vector_path = os.path.join(VECTORSTORE_DIR, index_name)
 
-        if os.path.exists(os.path.join(vector_path, "index.faiss")):
+        if os.path.exists(vector_path):
             embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-            db = FAISS.load_local(vector_path, embeddings)
+            db = Chroma(persist_directory=vector_path, embedding_function=embeddings)
 
             retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 3})
             qa_chain = RetrievalQA.from_chain_type(
